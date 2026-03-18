@@ -64,9 +64,9 @@ public class GameEntity {
         if (gameId != null ? !gameId.equals(that.gameId) : that.gameId != null) return false;
         if (colSize != that.colSize) return false;
         if (rowSize != that.rowSize) return false;
-        if (snakeLocation != null ? !snakeLocation.equals(that.snakeLocation) : that.snakeLocation != null)
+        if (snakeLocation != null ? !snakeLocation.toPoint().equals(that.snakeLocation.toPoint()) : that.snakeLocation != null)
             return false;
-        if (appleLocation != null ? !appleLocation.equals(that.appleLocation) : that.appleLocation != null)
+        if (appleLocation != null ? !appleLocation.toPoint().equals(that.appleLocation.toPoint()) : that.appleLocation != null)
             return false;
         return score == that.score;
     }
