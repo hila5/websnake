@@ -13,7 +13,6 @@ import webSnake.exception.GameMappingException;
 
 @Mapper(
         imports = MatrixUtil.class,
-        componentModel = "spring",
         uses = {MatrixUtil.class, PointEmbedMapper.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
