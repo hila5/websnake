@@ -5,8 +5,6 @@ public interface UserScoreRank {
 
     Long getUserId();
 
-//    Long getTotalScore();
-
     Long getUserRank();
 
 }
