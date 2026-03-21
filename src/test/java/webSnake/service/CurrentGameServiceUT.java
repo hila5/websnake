@@ -1,269 +1,323 @@
-//package webSnake.service;
-//
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import webSnake.api.dto.GameResponseDto;
-//import webSnake.domain.Game;
-//import webSnake.domain.MoveSnakeEnum;
-//import webSnake.entity.GameEntity;
-//import webSnake.exception.GameMappingException;
-//import webSnake.exception.ResourceNotFoundException;
-//import webSnake.exception.SnakeOutOfBoundsException;
-//import webSnake.mapper.GameMapper;
-//import webSnake.repositories.GameRepository;
-//
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class CurrentGameServiceUT {
-//
-//    @Mock
-//    private GameRepository gameRepositoryMock;
-//    @Mock
-//    private GameMapper gameMapperMock;
-//
-//    @InjectMocks
-//    private CurrentGameService currentGameService;
-//    Long firstGameId = 1L;
-//    Long gameId = 100L;
-//    int score = 2;
-//    int snakeX = 5;
-//    int snakeY = 5;
-//    int appleX = 5;
-//    int appleY = 5;
-//    String matrixJson = "[[0,0,0,0,0],[0,0,2,0,0],[0,0,0,1,0],[0,0,0,0,0]]";
-//    int[][] matrix = {{0, 0, 0, 0}, {0, 0, 2, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}};
-//    private Game game = new Game(matrix, snakeX, snakeY, appleX, appleY, score);
-//    private GameResponseDto gameResponseDto = GameResponseDto.builder().gameId(gameId).board(matrixJson).score(score).build();
-//    private GameEntity gameEntity = GameEntity.builder().gameId(gameId).matrixJson(matrixJson).score(score).snakeX(snakeX).snakeY(snakeY).appleX(appleX).appleY(appleY).build();
-//    private CurrentGameEntity currentGameEntity = CurrentGameEntity.builder().gameId(gameId).id(firstGameId).build();
-//
-//    @Nested
-//    class SetCurrentGame {
-//
-//        @Test
-//        void setCurrentGame_success() {
-//            //Arrange
-//            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.ofNullable(gameEntity));
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(currentGameRepositoryMock.save(currentGameEntity)).thenReturn(currentGameEntity);
-//            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
-//
-//            //Act
-//            GameResponseDto resultDto = currentGameService.setCurrentGame(gameId);
-//
-//            //Assert
-//            assertEquals(gameResponseDto, resultDto);
-//            verify(gameRepositoryMock).findById(gameId);
-//            verify(currentGameRepositoryMock).save(currentGameEntity);
-//            verify(gameMapperMock).toResponse(gameEntity);
-//        }
-//
-//        @Test
-//        void setCurrentGame_fail() {
-//            //Arrange
-//            when(gameRepositoryMock.findById(gameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act//Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.setCurrentGame(gameId));
-//        }
-//
-//    }
-//
-//    @Nested
-//    class GetCurrentGameEntity {
-//
-//        @Test
-//        void getCurrentGameEntity_success() {
-//            //Arrange
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenReturn(Optional.ofNullable(gameEntity));
-//
-//            //Act
-//            GameEntity currentGameEntity = currentGameService.getCurrentGameEntity();
-//
-//            //Assert
-//            assertEquals(gameEntity, currentGameEntity);
-//        }
-//
-//        @Test
-//        void getCurrentGameEntity_fail_whenCurrentGameNotFound() {
-//            //Arrange
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getCurrentGameEntity());
-//        }
-//
-//        @Test
-//        void getCurrentGameEntity_fail_whenGameNotFound() {
-//            //Arrange
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getCurrentGameEntity());
-//        }
-//
-//    }
-//
-//    @Nested
-//    class GetCurrentGame {
-//
-//        @Test
-//        void getCurrentGame_success() {
-//            //Arrange
-//            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenReturn(Optional.ofNullable(gameEntity));
-//
-//            //Act
-//            GameResponseDto resultDto = currentGameService.getCurrentGame();
-//
-//            //Assert
-//            assertEquals(gameResponseDto, resultDto);
-//        }
-//
-//        @Test
-//        void getCurrentGame_fail_whenCurrentGameNotFound() {
-//            //Arrange
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getCurrentGame());
-//        }
-//
-//        @Test
-//        void getCurrentGame_fail_whenGameNotFound() {
-//            //Arrange
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getCurrentGame());
-//        }
-//
-//    }
-//
-//    @Nested
-//    class MoveSnake {
-//
-//        @Test
-//        void moveSnake_success() {
-//            //Arrange
-//            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenReturn(Optional.ofNullable(gameEntity));
-//            doNothing().when(moveSnakeEnum).move(game);
-//            when(gameMapperMock.fromDomain(game)).thenReturn(gameEntity);
-//            when(gameRepositoryMock.save(gameEntity)).thenReturn(gameEntity);
-//            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
-//
-//            try {
-//                when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
-//            } catch (Exception e) {
-//                assert false;
-//            }
-//
-//            //Act
-//            GameResponseDto responseDto = currentGameService.moveSnake(moveSnakeEnum);
-//
-//            //Assert
-//            assertEquals(gameResponseDto, responseDto);
-//        }
-//
-//        @Test
-//        void moveSnake_fail_whenGameNotFound() {
-//            //Arrange
-//            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(ResourceNotFoundException.class, () -> currentGameService.moveSnake(moveSnakeEnum));
-//        }
-//
-//        @Test
-//        void moveSnake_fail_cantMoveSnake() {
-//            //Arrange
-//            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenReturn(Optional.ofNullable(gameEntity));
-//            doThrow(new SnakeOutOfBoundsException("Snake out of bounds")).when(moveSnakeEnum).move(game);
-//
-//            try {
-//                when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
-//            } catch (Exception e) {
-//                assert false;
-//            }
-//
-//            //Act
-//            //Assert
-//            assertThrows(SnakeOutOfBoundsException.class, () -> currentGameService.moveSnake(moveSnakeEnum));
-//        }
-//
-//        @Test
-//        void moveSnake_fail_cantMap() {
-//            //Arrange
-//            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
-//            when(currentGameRepositoryMock.findById(firstGameId)).thenReturn(Optional.ofNullable(currentGameEntity));
-//            when(gameRepositoryMock.findById(currentGameEntity.getGameId())).thenReturn(Optional.ofNullable(gameEntity));
-//            doNothing().when(moveSnakeEnum).move(game);
-//            when(gameMapperMock.fromDomain(game)).thenReturn(gameEntity);
-//            when(gameRepositoryMock.save(gameEntity)).thenReturn(gameEntity);
-//
-//            try {
-//                when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
-//            } catch (Exception e) {
-//                assert false;
-//            }
-//            when(gameMapperMock.toResponse(gameEntity)).thenThrow(new GameMappingException("Game mapping exception"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(GameMappingException.class, () -> currentGameService.moveSnake(moveSnakeEnum));
-//        }
-//
-//    }
-//
-//    @Nested
-//    class UpdateGameInDb {
-//
-//        @Test
-//        void updateGameInDb_success() {
-//            //Arrange
-//            when(gameMapperMock.fromDomain(game)).thenReturn(gameEntity);
-//            when(gameRepositoryMock.save(gameEntity)).thenReturn(gameEntity);
-//
-//            //Act
-//            GameEntity resultEntity = currentGameService.updateGameInDB(gameId, game);
-//
-//            //Assert
-//            assertEquals(gameEntity, resultEntity);
-//        }
-//
-//        @Test
-//        void updateGameInDb_fail_cantMap() {
-//            //Arrange
-//            when(gameMapperMock.fromDomain(game)).thenThrow(new GameMappingException("Game mapping exception"));
-//
-//            //Act
-//            //Assert
-//            assertThrows(GameMappingException.class, () -> currentGameService.updateGameInDB(gameId, game));
-//        }
-//
-//    }
-//
-//}
+package webSnake.service;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import webSnake.api.dto.GameResponseDto;
+import webSnake.domain.Game;
+import webSnake.domain.MoveSnakeEnum;
+import webSnake.entity.GameEntity;
+import webSnake.entity.PointEmbed;
+import webSnake.entity.UserEntity;
+import webSnake.exception.GameMappingException;
+import webSnake.exception.NotYoursGameException;
+import webSnake.exception.ResourceNotFoundException;
+import webSnake.exception.SnakeOutOfBoundsException;
+import webSnake.mapper.GameMapper;
+import webSnake.repositories.GameRepository;
+import webSnake.repositories.UserRepository;
+
+import java.awt.*;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class CurrentGameServiceUT {
+
+    @Mock
+    private GameRepository gameRepositoryMock;
+    @Mock
+    private UserRepository userRepositoryMock;
+    @Mock
+    private UserService userServiceMock;
+    @Mock
+    private GameMapper gameMapperMock;
+    @InjectMocks
+    private CurrentGameService currentGameService;
+
+    Long gameId = 100L;
+    String board = "[[1,0,0,0],[0,2,0,0],[0,0,0,0],[0,0,0,0]]";
+    int rowSize = 4;
+    int colSize = 4;
+    int snakeX = 0;
+    int snakeY = 0;
+    Point snakePoint = new Point(snakeX, snakeY);
+    PointEmbed snakePointEmb = new PointEmbed(snakePoint);
+    int appleX = 1;
+    int appleY = 1;
+    Point applePoint = new Point(appleX, appleY);
+    PointEmbed applePointEmb = new PointEmbed(applePoint);
+    int score = 10;
+    Game game = new Game(rowSize, colSize, snakePoint, applePoint, score);
+    Long userId = 1L;
+    String userIdentifier = "hila";
+    UserEntity userEntity = UserEntity.builder().userId(userId).build();
+    GameEntity gameEntity = GameEntity.builder().snakeLocation(snakePointEmb).appleLocation(applePointEmb).gameId(gameId).score(score).colSize(colSize).rowSize(rowSize).owner(userEntity).build();
+    GameResponseDto gameResponseDto = GameResponseDto.builder().gameId(gameId).board(board).score(score).build();
+
+    @Nested
+    class setUserCurrentGame {
+
+        @Test
+        void setUserCurrentGame_success() {
+            //Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.ofNullable(gameEntity));
+            when(userRepositoryMock.save(userEntity)).thenReturn(userEntity);
+            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
+
+            //Act
+            GameResponseDto result = currentGameService.setUserCurrentGame(userIdentifier, gameId);
+
+            //Assert
+            assertEquals(gameResponseDto, result);
+
+        }
+
+        @Test
+        void setUserCurrentGame_gameNotFound_throwsResourceNotFoundException() {
+            // Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.empty());
+
+            // Act // Assert
+            assertThrows(ResourceNotFoundException.class,
+                    () -> currentGameService.setUserCurrentGame(userIdentifier, gameId));
+        }
+
+        @Test
+        void setUserCurrentGame_notOwner_throwsNotYoursGameException() {
+            // Arrange
+            UserEntity otherUser = UserEntity.builder().userId(99L).build();
+            GameEntity otherGame = GameEntity.builder().gameId(gameId).owner(otherUser).build();
+
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(otherGame));
+
+            // Act //Assert
+            assertThrows(NotYoursGameException.class,
+                    () -> currentGameService.setUserCurrentGame(userIdentifier, gameId));
+        }
+
+    }
+
+    @Nested
+    class getUserCurrentGameEntity {
+
+        @Test
+        void getUserCurrentGameEntity_success() {
+            // Arrange
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+
+            // Act
+            GameEntity result = currentGameService.getUserCurrentGameEntity(userIdentifier);
+
+            // Assert
+            assertEquals(gameEntity, result);
+        }
+
+        @Test
+        void getCurrentGameEntity_fail_whenUserNotFound() {
+            //Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenThrow(new ResourceNotFoundException("Resource not found"));
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGameEntity(userIdentifier));
+        }
+
+        @Test
+        void getCurrentGameEntity_fail_whenGameNotFound() {
+            //Arrange
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGameEntity(userIdentifier));
+        }
+
+        @Test
+        void getCurrentGameEntity_fail_whenCurrentGameNotSet() {
+            //Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGameEntity(userIdentifier));
+        }
+
+        @Test
+        void getUserCurrentGameEntity_fail_whenCantFindInRepo() {
+            // Arrange
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.empty());
+
+            // Act
+            // Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGameEntity(userIdentifier));
+        }
+
+    }
+
+    @Nested
+    class getUserCurrentGame {
+
+        @Test
+        void getUserCurrentGame_success() {
+            //Arrange
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
+
+            //Act
+            GameResponseDto resultDto = currentGameService.getUserCurrentGame(userIdentifier);
+
+            //Assert
+            assertEquals(gameResponseDto, resultDto);
+        }
+
+        @Test
+        void getUserCurrentGame_fail_whenUserNotFound() {
+            //Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenThrow(new ResourceNotFoundException("Resource not found"));
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGame(userIdentifier));
+
+        }
+
+        @Test
+        void getUserCurrentGame_fail_whenCurrentGameNotFound() {
+            //Arrange
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenThrow(new ResourceNotFoundException("Resource not found"));
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGame(userIdentifier));
+        }
+
+        @Test
+        void getUserCurrentGame_fail_whenCurrentGameNotSet() {
+            //Arrange
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+
+            //Act
+            //Assert
+            assertThrows(ResourceNotFoundException.class, () -> currentGameService.getUserCurrentGame(userIdentifier));
+        }
+
+    }
+
+    @Nested
+    class MoveSnake {
+
+        @Test
+        void moveSnake_success() throws Exception {
+            //Arrange
+            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
+            doNothing().when(moveSnakeEnum).move(game);
+
+            //updateGameInDB
+            when(gameMapperMock.fromDomain(game)).thenReturn(gameEntity);
+            when(gameRepositoryMock.save(gameEntity)).thenReturn(gameEntity);
+            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
+            doNothing().when(userServiceMock).updateLastPlayedForUser(userEntity);
+            //Act
+            GameResponseDto responseDto = currentGameService.moveSnake(userIdentifier, moveSnakeEnum);
+
+            //Assert
+            assertEquals(gameResponseDto, responseDto);
+        }
+
+        @Test
+        void moveSnake_failed_cantMapToGameDomain() throws Exception {
+            //Arrange
+            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toGameDomain(gameEntity)).thenThrow(new GameMappingException("mapping error"));
+
+            //Act//Assert
+            assertThrows(GameMappingException.class, () -> currentGameService.moveSnake(userIdentifier, moveSnakeEnum));
+        }
+
+        @Test
+        void moveSnake_fail_cantMoveSnake() throws Exception {
+            //Arrange
+            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
+            doThrow(new SnakeOutOfBoundsException("Snake out of bounds")).when(moveSnakeEnum).move(game);
+
+            //Act
+            //Assert
+            assertThrows(SnakeOutOfBoundsException.class, () -> currentGameService.moveSnake(userIdentifier, moveSnakeEnum));
+        }
+
+        @Test
+        void moveSnake_fail_cantMapFromDomain() throws Exception {
+            //Arrange
+            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
+            doNothing().when(moveSnakeEnum).move(game);
+
+            //updateGameInDB
+            when(gameMapperMock.fromDomain(game)).thenThrow(new GameMappingException("cant map"));
+
+            //Act
+            //Assert
+            assertThrows(GameMappingException.class, () -> currentGameService.moveSnake(userIdentifier, moveSnakeEnum));
+        }
+
+        @Test
+        void moveSnake_fail_cantMap() throws Exception {
+            //Arrange
+            //Arrange
+            MoveSnakeEnum moveSnakeEnum = mock(MoveSnakeEnum.class);
+            userEntity.setCurrentGameId(gameId);
+            when(userServiceMock.getUserEntityByIdentifier(userIdentifier)).thenReturn(userEntity);
+            when(gameRepositoryMock.findById(gameId)).thenReturn(Optional.of(gameEntity));
+            when(gameMapperMock.toGameDomain(gameEntity)).thenReturn(game);
+            doNothing().when(moveSnakeEnum).move(game);
+
+            //updateGameInDB
+            when(gameMapperMock.fromDomain(game)).thenReturn(gameEntity);
+            when(gameRepositoryMock.save(gameEntity)).thenReturn(gameEntity);
+            when(gameMapperMock.toResponse(gameEntity)).thenReturn(gameResponseDto);
+            doNothing().when(userServiceMock).updateLastPlayedForUser(userEntity);
+
+            when(gameMapperMock.toResponse(gameEntity)).thenThrow(new GameMappingException("Game mapping exception"));
+
+            //Act
+            //Assert
+            assertThrows(GameMappingException.class, () -> currentGameService.moveSnake(userIdentifier, moveSnakeEnum));
+        }
+
+    }
+
+}
