@@ -103,7 +103,7 @@ public class CurrentGameService {
         }
     }
 
-    public GameEntity updateGameInDB(GameEntity gameEntity, Game updatedGame) {
+    private GameEntity updateGameInDB(GameEntity gameEntity, Game updatedGame) {
         log.info("updateGameInDB started.");
         long gameId = gameEntity.getGameId();
         GameEntity updatedGameEntity;
