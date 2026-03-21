@@ -20,7 +20,6 @@ public class GameMapperUT {
 
     Long gameId = 100L;
     String board = "[[1,0,0,0],[0,2,0,0],[0,0,0,0],[0,0,0,0]]";
-    int[][] matrix = {{1, 0, 0, 0}, {0, 2, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
     int rowSize = 4;
     int colSize = 4;
     int snakeX = 0;
