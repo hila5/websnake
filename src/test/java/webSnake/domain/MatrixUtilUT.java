@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.awt.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MatrixUtilUT {
@@ -55,5 +56,52 @@ public class MatrixUtilUT {
 
     }
 
+    @Nested
+    class MatrixToString {
+
+        @Test
+        void matrixToString_success() throws Exception {
+            // Arrange
+            int rowSize = 4;
+            int colSize = 4;
+            Point snakeLocation = new Point(0, 0);
+            Point appleLocation = new Point(1, 1);
+
+            // Act
+            String result = MatrixUtil.matrixToString(rowSize, colSize, snakeLocation, appleLocation);
+
+            // Assert
+            assertEquals("[[1,0,0,0],[0,2,0,0],[0,0,0,0],[0,0,0,0]]", result);
+        }
+
+        @Test
+        void matrixToString_snakeAndAppleSameLocation_appleOverridesSnake() throws Exception {
+            // Arrange
+            int rowSize = 4;
+            int colSize = 4;
+            Point snakeLocation = new Point(0, 0);
+            Point appleLocation = new Point(0, 0);
+
+            // Act
+            String result = MatrixUtil.matrixToString(rowSize, colSize, snakeLocation, appleLocation);
+
+            // Assert
+            assertEquals("[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]", result);
+        }
+
+        @Test
+        void matrixToString_snakeOutOfBounds_throwsException() {
+            // Arrange
+            int rowSize = 4;
+            int colSize = 4;
+            Point snakeLocation = new Point(10, 10);
+            Point appleLocation = new Point(1, 1);
+
+            // Act & Assert
+            assertThrows(Exception.class,
+                    () -> MatrixUtil.matrixToString(rowSize, colSize, snakeLocation, appleLocation));
+        }
+
+    }
 
 }
