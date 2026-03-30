@@ -42,11 +42,11 @@ public class GameService {
         GameEntity gameEntity = gameMapper.fromDomain(newGame);
         gameEntity.setOwner(userEntity);
         gameRepository.save(gameEntity);
-        currentGameService.setUserCurrentGame(userIdentifier, gameEntity.getGameId());
+        GameResponseDto responseDto = currentGameService.setUserCurrentGame(userIdentifier, gameEntity.getGameId());
 
         log.info("createGame finished. userIdentifier:{}, rows:{}, cols:{}", gameDto.getUserIdentifier(), rows, cols);
 
-        return gameMapper.toResponse(gameEntity);
+        return responseDto;
     }
 
     public List<GameResponseDto> getAllGames() {
