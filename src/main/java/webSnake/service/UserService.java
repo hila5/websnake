@@ -92,7 +92,6 @@ public class UserService {
         return identifier -> Optional.ofNullable(userRepository.findByUsername(identifier));
     }
 
-
     public void deleteUser(String identifier) {
         log.info("deleteUser started." + identifier);
 
